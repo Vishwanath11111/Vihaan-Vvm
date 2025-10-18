@@ -353,9 +353,15 @@ async def get_dashboard_data():
     active_subscriptions = await db.subscriptions.count_documents({"status": "active"})
     total_visits = await db.visits.count_documents({})
     
-    # Get recent activities
+    # Get recent activities and remove MongoDB _id fields
     recent_subscriptions = await db.subscriptions.find({}).sort("created_at", -1).limit(5).to_list(5)
     recent_visits = await db.visits.find({}).sort("created_at", -1).limit(10).to_list(10)
+    
+    # Remove _id fields from recent data
+    for sub in recent_subscriptions:
+        sub.pop('_id', None)
+    for visit in recent_visits:
+        visit.pop('_id', None)
     
     return {
         "total_customers": total_customers,
