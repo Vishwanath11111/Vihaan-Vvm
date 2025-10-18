@@ -114,28 +114,29 @@ class VihaaanCareAPITester:
     
     def test_user_login(self):
         """Test user login for all created users"""
-        login_credentials = [
-            {"email": "priya.sharma@gmail.com", "password": "SecurePass123", "role": "customer"},
-            {"email": "anjali.nurse@vihaancare.com", "password": "NursePass456", "role": "team_member"},
-            {"email": "admin@vihaancare.com", "password": "AdminPass789", "role": "admin"}
-        ]
+        roles = ["customer", "team_member", "admin"]
         
-        for creds in login_credentials:
-            try:
-                response = self.session.post(f"{API_URL}/users/login", json={
-                    "email": creds["email"],
-                    "password": creds["password"]
-                })
-                if response.status_code == 200:
-                    data = response.json()
-                    if "user" in data and data["user"]["role"] == creds["role"]:
-                        self.log_result(f"Login {creds['role']}", True, f"Successfully logged in as {creds['role']}")
+        for role in roles:
+            creds_key = f"{role}_credentials"
+            if creds_key in self.test_data:
+                creds = self.test_data[creds_key]
+                try:
+                    response = self.session.post(f"{API_URL}/users/login", json={
+                        "email": creds["email"],
+                        "password": creds["password"]
+                    })
+                    if response.status_code == 200:
+                        data = response.json()
+                        if "user" in data and data["user"]["role"] == role:
+                            self.log_result(f"Login {role}", True, f"Successfully logged in as {role}")
+                        else:
+                            self.log_result(f"Login {role}", False, f"Invalid response structure: {data}")
                     else:
-                        self.log_result(f"Login {creds['role']}", False, f"Invalid response structure: {data}")
-                else:
-                    self.log_result(f"Login {creds['role']}", False, f"Status: {response.status_code}, Response: {response.text}")
-            except Exception as e:
-                self.log_result(f"Login {creds['role']}", False, f"Error: {str(e)}")
+                        self.log_result(f"Login {role}", False, f"Status: {response.status_code}, Response: {response.text}")
+                except Exception as e:
+                    self.log_result(f"Login {role}", False, f"Error: {str(e)}")
+            else:
+                self.log_result(f"Login {role}", False, f"No credentials available for {role}")
     
     def test_get_user_details(self):
         """Test getting user details"""
