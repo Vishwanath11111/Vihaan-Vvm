@@ -183,8 +183,9 @@ async def login_user(login_data: UserLogin):
     if not user['is_active']:
         raise HTTPException(status_code=401, detail="Account is deactivated")
     
-    # Remove password hash from response
+    # Remove password hash and MongoDB _id from response
     user.pop('password_hash')
+    user.pop('_id', None)
     return {"user": user, "message": "Login successful"}
 
 @api_router.get("/users/{user_id}", response_model=User)
