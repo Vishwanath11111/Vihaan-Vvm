@@ -63,11 +63,14 @@ class VihaaanCareAPITester:
     
     def test_create_users(self):
         """Test user creation for all roles"""
+        import time
+        timestamp = str(int(time.time()))
+        
         users_to_create = [
             {
                 "name": "Priya Sharma",
-                "email": "priya.sharma@gmail.com",
-                "phone": "+91-9876543210",
+                "email": f"priya.sharma.{timestamp}@gmail.com",
+                "phone": f"+91-987654321{timestamp[-1]}",
                 "password": "SecurePass123",
                 "role": "customer",
                 "address": "123 MG Road, Bangalore",
@@ -75,8 +78,8 @@ class VihaaanCareAPITester:
             },
             {
                 "name": "Nurse Anjali",
-                "email": "anjali.nurse@vihaancare.com",
-                "phone": "+91-9876543211",
+                "email": f"anjali.nurse.{timestamp}@vihaancare.com",
+                "phone": f"+91-987654322{timestamp[-1]}",
                 "password": "NursePass456",
                 "role": "team_member",
                 "address": "456 Brigade Road, Bangalore",
@@ -84,8 +87,8 @@ class VihaaanCareAPITester:
             },
             {
                 "name": "Admin Rajesh",
-                "email": "admin@vihaancare.com",
-                "phone": "+91-9876543212",
+                "email": f"admin.{timestamp}@vihaancare.com",
+                "phone": f"+91-987654323{timestamp[-1]}",
                 "password": "AdminPass789",
                 "role": "admin",
                 "address": "789 Commercial Street, Bangalore",
@@ -99,6 +102,10 @@ class VihaaanCareAPITester:
                 if response.status_code == 200:
                     user = response.json()
                     self.test_data[f"{user_data['role']}_user"] = user
+                    self.test_data[f"{user_data['role']}_credentials"] = {
+                        "email": user_data["email"],
+                        "password": user_data["password"]
+                    }
                     self.log_result(f"Create {user_data['role']} user", True, f"Created user: {user['name']}")
                 else:
                     self.log_result(f"Create {user_data['role']} user", False, f"Status: {response.status_code}, Response: {response.text}")
